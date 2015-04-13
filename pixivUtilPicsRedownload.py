@@ -307,6 +307,7 @@ if __name__ == '__main__':
 	print " downFile:\t", repr(downFile)
 	print " pixivutilPath:\t", pixivutilPath
 	print " isDoneShut:\t", isDoneShut
+	print " handleErrMode:\t", handleErrs
 	print "----------------"
 
 	if 'y' != raw_input('start? (y/n)'):
