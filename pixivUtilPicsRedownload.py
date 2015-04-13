@@ -41,16 +41,16 @@ def GetPixivErrMemberId(filename):
 	return m[-1].split('.')[0]
 
 def GetPixivLinkImageId(filename):
-	"""@param filename: like 'http://www.pixiv.net/member_illust.php?id=493189'
+	"""@param filename: like 'http://www.pixiv.net/member_illust.php?mode=manga&illust_id=49729370' or 'http://www.pixiv.net/member_illust.php?mode=medium&illust_id=48784432'
 @return: imageId like '493189'
 """
 	if re.match('^\d+$', filename):
 		return filename
-	matchs = r'^http.*pixiv.*member_illust\.php\?mode=medium&illust_id='
+	matchs = r'^http.*pixiv.*member_illust\.php\?mode=\w*&illust_id=(\d*)'
 	m = re.split(matchs, filename)
-	if len(m) < 2:
+	if len(m) < 3:
 		return None
-	return m[-1].split('.')[0]
+	return m[1].split('.')[0]
 
 def GetPixivLinkMemberId(filename):
 	"""@param filename: like 'http://www.pixiv.net/member_illust.php?id=493189'
@@ -58,11 +58,11 @@ def GetPixivLinkMemberId(filename):
 """
 	if re.match('^\d+$', filename):
 		return filename
-	matchs = r'^http.*pixiv.*_illust\.php\?id='
+	matchs = r'^http.*pixiv.*_illust\.php\?id=(\d*)'
 	m = re.split(matchs, filename)
-	if len(m) < 2:
+	if len(m) < 3:
 		return None
-	return m[-1].split('.')[0]
+	return m[1].split('.')[0]
 
 def toShutdown():
 	"shutdown system without wait"
