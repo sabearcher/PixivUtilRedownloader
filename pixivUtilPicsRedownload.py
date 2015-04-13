@@ -13,6 +13,7 @@ import re
 import sys
 import copy
 import subprocess
+import getopt
 
 pixivExeFile = 'PixivUtil2.exe'
 pixivErrorDir = 'errs'
@@ -72,7 +73,7 @@ def toShutdown():
 	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	print p.pid, p.stdout.read()
 
-def reDownErrorPics(pixivutilPath, isDoneShut):
+def reDownErrorPics(pixivutilPath):
 	"download error pics in dir pixivutilPath\errs"
 	if len(pixivutilPath) == 0:
 		print '!---pixivutilPath cant be null'
@@ -184,7 +185,7 @@ def reDownPicsByFile1(pixivutilPath, downFile, isDoneShut):
 		toShutdown()
 	return 0
 
-def reDownPicsByFile2(pixivutilPath, downFile, isDoneShut):
+def reDownPicsByFile2(pixivutilPath, downFile):
 	"download pixiv pics in pixivutilPath\downFile"
 	if len(pixivutilPath) == 0:
 		print '!---pixivutilPath cant be null'
@@ -263,39 +264,56 @@ defaultPixivUtilPath = r'D:\Program Files\pixivutil20150218'
 
 
 def usage():
-	print 'need arg: cmdFile[0], downFile[1], pixivutilPath[2], isDoneShut[3]'
-	print '-default: '
-	print '\t-[1] "error"/"errs"/"err" for path/%s/* redownload' % pixivErrorDir
-	print '\t[2] PixivUtil path default:', defaultPixivUtilPath
-	print '\t-[3] "T" for doneShut true'
+	print 'usage:\n python cmdFile [-h/--help] [-s/--shut] [--err] [-p pixivutilPath/--path=pixivutilPath] downFile'
+	print 'options:'
+	print ' --err:\t\t\tpath/%s/* redownload' % pixivErrorDir
+	print ' --path default:\t', defaultPixivUtilPath
+	print ' --shut:\t\tshut down system when shell finished'
 
 if __name__ == '__main__':
-	print sys.argv
-	usage()
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "hsp:", ["err", "help", "shut", "path="])
+	except getopt.GetoptError as err:
+		usage()
+		print "!!ARG error!!"
+		sys.exit(-2)
 
-	if (len(sys.argv) < 2):
-		sys.exit(-1)
+	# global settings
+	isDoneShut = False
+	pixivutilPath = defaultPixivUtilPath
+	handleErrs = False
+
+	#print opts, args
+	for opt, arg in opts:
+		if opt in ['-h', '--help']:
+			usage()
+			sys.exit(0)
+		elif opt in ['-s', '--shut']:
+			isDoneShut = True
+		elif opt in ['-p', '--path']:
+			pixivutilPath = arg
+		elif opt in ['--err']:
+			handleErrs = True
+		else:
+			assert False, "unhandled option: " + opt
+
+	if (len(args) < 1):
+		#print "no downFile!!"
+		downFile = ""
 	else:
-		downFile = sys.argv[1]
-	if (len(sys.argv) < 3):
-		pixivutilPath = defaultPixivUtilPath
-	else:
-		pixivutilPath = sys.argv[2]
-		if not len(pixivutilPath):
-			pixivutilPath = defaultPixivUtilPath
-	if len(sys.argv) >= 4 and sys.argv[3] == "T":
-		isDoneShut = True
-	else:
-		isDoneShut = False
-	print "your args:", sys.argv[1:]
-	print " pixivutilPath:", pixivutilPath
-	print " isDoneShut:", isDoneShut
+		downFile = args[0]
+
+	print "Your args:------"
+	print " downFile:\t", repr(downFile)
+	print " pixivutilPath:\t", pixivutilPath
+	print " isDoneShut:\t", isDoneShut
+	print "----------------"
 
 	if 'y' != raw_input('start? (y/n)'):
 		sys.exit(0)
-	if downFile == 'error' or downFile == 'err' or downFile == 'errs':
-		res = reDownErrorPics(pixivutilPath, isDoneShut)
+	if handleErrs:
+		res = reDownErrorPics(pixivutilPath)
 	else:
-		#res = reDownPicsByFile1(pixivutilPath, downFile, isDoneShut)
-		res = reDownPicsByFile2(pixivutilPath, downFile, isDoneShut)
+		#res = reDownPicsByFile1(pixivutilPath, downFile)
+		res = reDownPicsByFile2(pixivutilPath, downFile)
 	sys.exit(res)
