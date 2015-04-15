@@ -260,19 +260,21 @@ def reDownPicsByFile2(pixivutilPath, downFile):
 	return 0
 
 
-defaultPixivUtilPath = r'D:\Program Files\pixivutil20150218'
+defaultPixivUtilPath = r'D:\Program Files\pixivutil20150403-beta'
 
 
 def usage():
-	print 'usage:\n python cmdFile [-h/--help] [-s/--shut] [--err] [-p pixivutilPath/--path=pixivutilPath] downFile'
-	print 'options:'
-	print ' --err:\t\t\tpath/%s/* redownload' % pixivErrorDir
-	print ' --path default:\t', defaultPixivUtilPath
-	print ' --shut:\t\tshut down system when shell finished'
+	print '******\nusage:\n python cmdFile [options] [downFile]'
+	print '******\noptions:'
+	print ' --help/-h:\t\tusage of commands'
+	print ' --path=/-p (default):\t', defaultPixivUtilPath
+	print ' --shut/-s:\t\tshut down system when shell finished'
+	print ' --force/-f:\t\tnot show args'
+	print ' --err:\t\t\tError Redown Mode. path/%s/* redownload' % pixivErrorDir
 
 if __name__ == '__main__':
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hsp:", ["err", "help", "shut", "path="])
+		opts, args = getopt.getopt(sys.argv[1:], "hsp:f", ["err", "help", "shut", "path=", "force"])
 	except getopt.GetoptError as err:
 		usage()
 		print "!!ARG error!!"
@@ -282,6 +284,7 @@ if __name__ == '__main__':
 	isDoneShut = False
 	pixivutilPath = defaultPixivUtilPath
 	handleErrs = False
+	toListArgs = True
 
 	#print opts, args
 	for opt, arg in opts:
@@ -294,6 +297,8 @@ if __name__ == '__main__':
 			pixivutilPath = arg
 		elif opt in ['--err']:
 			handleErrs = True
+		elif opt in ['-f', '--force']:
+			toListArgs = False
 		else:
 			assert False, "unhandled option: " + opt
 
@@ -303,15 +308,16 @@ if __name__ == '__main__':
 	else:
 		downFile = args[0]
 
-	print "Your args:------"
-	print " downFile:\t", repr(downFile)
-	print " pixivutilPath:\t", pixivutilPath
-	print " isDoneShut:\t", isDoneShut
-	print " handleErrMode:\t", handleErrs
-	print "----------------"
+	if toListArgs:
+		print "Your args:------"
+		print " downFile:\t", repr(downFile)
+		print " pixivutilPath:\t", pixivutilPath
+		print " isDoneShut:\t", isDoneShut
+		print " handleErrMode:\t", handleErrs
+		print "----------------"
+		if 'y' != raw_input('start? (y/n)'):
+			sys.exit(0)
 
-	if 'y' != raw_input('start? (y/n)'):
-		sys.exit(0)
 	if handleErrs:
 		res = reDownErrorPics(pixivutilPath)
 	else:
