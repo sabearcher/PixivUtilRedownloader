@@ -1,6 +1,7 @@
 # PixivUtilRedownloader
 
 (test) master
+version 0.1
 
 a python Shell using Nandaka/PixivUtil2 to download
 **only work on windows**
